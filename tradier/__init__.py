@@ -109,7 +109,7 @@ def account_orders(account_id):
 
 # ---------------------------------------------------------------
 
-Quote = namedtuple("Quote", ["symbol", "root_symbols", "last", "description", "exch", "type", "change",
+QuoteX = namedtuple("QuoteX", ["symbol", "root_symbols", "last", "description", "exch", "type", "change",
                              "open", "close", "prevclose", "low", "high", "week_52_low", "week_52_high",
                              "change_percentage", "volume", "trade_date", "average_volume", "last_volume",
                              "ask", "askexch", "ask_date", "asksize",
@@ -122,19 +122,15 @@ def market_quotes(symbols):
     params = {"symbols": ",".join(symbols)}
     js = _get_all(rsrc, params)
     for q in js['quotes']['quote']:
-        results.append(Quote(**q))
+        results.append(QuoteX(**q))
     return results
 
 
-# TODO : /v1/markets/timesales
-# TODO : /v1/markets/options/chains
-# TODO : /v1/markets/options/strikes
-# TODO : /v1/markets/options/expirations
-# TODO : /v1/markets/clock
-# TODO : /v1/markets/calendar
+Quote = namedtuple('Quote', ["high", "volume", "low", "date", "close", "open"])
 
 
 def market_history(symbol, interval=None, start=None, end=None):
+    results = []
     rsrc = "/v1/markets/history"
     params = {"symbol": symbol}
     if interval is not None:
@@ -144,7 +140,18 @@ def market_history(symbol, interval=None, start=None, end=None):
     if end is not None:
         params["end"] = end
 
-    return _get_all(rsrc, params)
+    js = _get_all(rsrc, params)
+    for s in js['history']['day']: # TODO: support different intervals
+        results.append(Quote(**s))
+    return results
+
+
+# TODO : /v1/markets/timesales
+# TODO : /v1/markets/options/chains
+# TODO : /v1/markets/options/strikes
+# TODO : /v1/markets/options/expirations
+# TODO : /v1/markets/clock
+# TODO : /v1/markets/calendar
 
 
 # ---------------------------------------------------------------

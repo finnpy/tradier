@@ -29,6 +29,16 @@ class TestAPI(unittest.TestCase):
             self.assertEqual(r[1].high, 146.11)
             self.assertEqual(r[1].volume, 22082432)
 
+    def test_market_history(self):
+        if local:
+            inject_response("market_history.json")
+        r = tradier.market_history("aapl")
+        print(r)
+        if local:
+            self.assertEqual(len(r), 123)
+            self.assertEqual(r[0].high, 116.33)
+            self.assertEqual(r[-1].high, 146.11)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
