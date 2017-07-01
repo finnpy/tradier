@@ -39,6 +39,20 @@ class TestAPI(unittest.TestCase):
             self.assertEqual(r[0].high, 116.33)
             self.assertEqual(r[-1].high, 146.11)
 
+    def test_market_calendar(self):
+        if local:
+            inject_response("market_calendar.json")
+        r = tradier.market_calendar()
+        for day in r:
+            print(day.status),
+        if local:
+            self.assertEqual(len(r), 30)
+            self.assertEqual(r[0].date, "2017-06-01")
+            self.assertEqual(r[0].status, "open")
+            self.assertEqual(r[24].date, "2017-06-25")
+            self.assertEqual(r[24].status, "closed")
+            self.assertEqual(r[29].date, "2017-06-30")
+            self.assertEqual(r[29].status, "open")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

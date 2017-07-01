@@ -146,13 +146,26 @@ def market_history(symbol, interval=None, start=None, end=None):
     return results
 
 
+CalendarDay = namedtuple("CalendarDay", ["date", "status", "description"])
+
+
+def market_calendar():
+    results = []
+    rsrc = "/v1/markets/calendar"
+    js = _get_all(rsrc, {})
+    for day in js['calendar']['days']['day']:
+        # print(type(day), day)
+        results.append(CalendarDay(date=day["date"], status=day["status"], description=day["description"]))
+    return results
+
+
 # TODO : /v1/markets/timesales
 # TODO : /v1/markets/options/chains
 # TODO : /v1/markets/options/strikes
 # TODO : /v1/markets/options/expirations
 # TODO : /v1/markets/clock
-# TODO : /v1/markets/calendar
-
+# TODO : /v1/markets/search
+# TODO : /v1/markets/lookup
 
 # ---------------------------------------------------------------
 
@@ -186,4 +199,5 @@ def _get_all(resource, params, shape=None):
 
 
 if __name__ == "__main__":
-    print(market_quotes("AAPL"))
+    res = market_calendar()
+    print(res)
