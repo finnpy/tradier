@@ -9,7 +9,7 @@ setup(name='tradier',
       license='MIT',
       packages=['tradier'],
       install_requires=[
-          'requests',
+          'requests', 'python-dateutil'
       ],
       test_suite='nose.collector',
       tests_require=['nose'],

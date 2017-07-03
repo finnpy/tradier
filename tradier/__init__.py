@@ -4,6 +4,7 @@ import urllib
 from collections import namedtuple
 
 import requests
+import dateutil.parser
 
 Profile = namedtuple("Profile",
                      ["account_number", "day_trader", "option_level", "type", "last_update", "name", "id", "status",
@@ -38,19 +39,34 @@ def account_balances(account_id):
     return results
 
 
+Account = namedtuple("Account", ["account_number", "positions"])
 Position = namedtuple('Position', ["cost_basis", "date_acquired", "id", "quantity", "symbol"])
 
 
 def user_positions():
     rsrc = "/v1/user/positions"
-    results = _get_all(rsrc, {}, shape=Position)
-    for entry in results:
-        print(entry)
-    return results
+    results = _get_all(rsrc, {}, shape=Account)
+    print(json.dumps(results, indent=4, separators=(',', ': ')))
+    accounts = []
+    for a in results['accounts']:
+        acct_number = a['account']['account_number']
+        raw_pos = a['account']['positions']
+        pos = []
+        for p in raw_pos:
+            p['position']['date_acquired'] = dateutil.parser.parse(p['position']['date_acquired'])   # TODO: improve
+            pos.append(Position(**p["position"]))
+        accounts.append(Account(account_number=acct_number, positions=pos))
+    return accounts
 
 
 def account_positions(account_id):
     rsrc = "/v1/accounts/{}/positions".format(account_id)
+    results = _get_all(rsrc, {}, shape=Account)
+    pos=[]
+    for p in results['positions']:
+        p['position']['date_acquired'] = dateutil.parser.parse(p['position']['date_acquired'])  # TODO: improve
+        pos.append(Position(**p["position"]))
+    return pos
 
 
 Event = namedtuple('Event', ["amount", "date", "type", "description", "commission",

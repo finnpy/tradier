@@ -1,5 +1,6 @@
 import json
 import unittest
+import datetime
 
 import tradier
 
@@ -53,6 +54,36 @@ class TestAPI(unittest.TestCase):
             self.assertEqual(r[24].status, "closed")
             self.assertEqual(r[29].date, "2017-06-30")
             self.assertEqual(r[29].status, "open")
+
+
+class TestAccounts(unittest.TestCase):
+
+    def test_account_positions(self):
+        if local:
+            inject_response("account_positions.json")
+        pos = tradier.account_positions("87654321")
+        if local:
+            self.assertEqual(len(pos), 8)
+            self.assertSequenceEqual(sorted([c.symbol for c in pos]),
+                                     ["AAPL", "BBRY131019P00008000", "DD", "GE",
+                                      "GE140118C00025000", "INTC", "SPY131019C00168000", "SPY131019C00170000"])
+            for p in pos:
+                self.assertIsInstance(p.date_acquired, datetime.datetime)
+
+    def test_user_positions(self):
+        if local:
+            inject_response("user_positions.json")
+        accts = tradier.user_positions()
+        if local:
+            for pos in accts:
+                print(pos)
+            self.assertEqual(len(accts), 2)
+            self.assertEqual(accts[0].account_number, "12345678")
+            self.assertEqual(len(accts[0].positions), 3)
+            self.assertEqual(accts[1].account_number, "87654321")
+            self.assertEqual(len(accts[1].positions), 8)
+
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
