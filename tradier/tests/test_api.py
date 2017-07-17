@@ -1,6 +1,7 @@
 import json
 import unittest
 import datetime
+import os.path
 
 import tradier
 
@@ -8,6 +9,7 @@ local = True
 
 
 def inject_response(name):
+    name = os.path.join(os.path.dirname(__file__), name)
     with open(name, "r") as f:
         lines = f.readlines()
     print(len(lines))
