@@ -35,7 +35,7 @@ Tradier requires the following modules:
 .. |build-status| image:: https://travis-ci.org/finnpy/tradier.svg?branch=master
    :target: https://travis-ci.org/finnpy/tradier
    :alt: Build status
-.. |coverage-status| image:: https://img.shields.io/coveralls/finnpy/tradier.svg
-   :target: https://coveralls.io/r/finnpy/tradier
+.. |coverage-status| image:: https://coveralls.io/repos/github/finnpy/tradier/badge.svg?branch=master
+   :target: https://coveralls.io/github/finnpy/tradier?branch=master
    :alt: Test coverage percentage
 
