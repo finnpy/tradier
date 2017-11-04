@@ -2,9 +2,10 @@ import json
 import time
 import urllib
 from collections import namedtuple
+from os.path import expanduser, join
 
-import requests
 import dateutil.parser
+import requests
 
 Profile = namedtuple("Profile",
                      ["account_number", "day_trader", "option_level", "type", "last_update", "name", "id", "status",
@@ -53,7 +54,7 @@ def user_positions():
         raw_pos = a['account']['positions']
         pos = []
         for p in raw_pos:
-            p['position']['date_acquired'] = dateutil.parser.parse(p['position']['date_acquired'])   # TODO: improve
+            p['position']['date_acquired'] = dateutil.parser.parse(p['position']['date_acquired'])  # TODO: improve
             pos.append(Position(**p["position"]))
         accounts.append(Account(account_number=acct_number, positions=pos))
     return accounts
@@ -62,7 +63,7 @@ def user_positions():
 def account_positions(account_id):
     rsrc = "/v1/accounts/{}/positions".format(account_id)
     results = _get_all(rsrc, {}, shape=Account)
-    pos=[]
+    pos = []
     for p in results['positions']:
         p['position']['date_acquired'] = dateutil.parser.parse(p['position']['date_acquired'])  # TODO: improve
         pos.append(Position(**p["position"]))
@@ -126,10 +127,10 @@ def account_orders(account_id):
 # ---------------------------------------------------------------
 
 QuoteX = namedtuple("QuoteX", ["symbol", "root_symbols", "last", "description", "exch", "type", "change",
-                             "open", "close", "prevclose", "low", "high", "week_52_low", "week_52_high",
-                             "change_percentage", "volume", "trade_date", "average_volume", "last_volume",
-                             "ask", "askexch", "ask_date", "asksize",
-                             "bid", "bidexch", "bid_date", "bidsize"])
+                               "open", "close", "prevclose", "low", "high", "week_52_low", "week_52_high",
+                               "change_percentage", "volume", "trade_date", "average_volume", "last_volume",
+                               "ask", "askexch", "ask_date", "asksize",
+                               "bid", "bidexch", "bid_date", "bidsize"])
 
 
 def market_quotes(symbols):
@@ -157,7 +158,7 @@ def market_history(symbol, interval=None, start=None, end=None):
         params["end"] = end
 
     js = _get_all(rsrc, params)
-    for s in js['history']['day']: # TODO: support different intervals
+    for s in js['history']['day']:  # TODO: support different intervals
         results.append(Quote(**s))
     return results
 
@@ -189,16 +190,20 @@ def market_calendar():
 max_pages = None
 
 
-def _get(resource, params):
-    # TODO : don't open the keys file on every page get
-    # TODO : move implementation into separate get_auth() function
-    with open("keys.json") as f:
-        keys = json.load(f)['tradier']
+def read_config():
+    with open(join(expanduser("~"), ".finnpy", "intrinio.json")) as f:
+        cfg = json.load(f)
+    return cfg
 
+
+_config = read_config()
+
+
+def _get(resource, params):
     query = urllib.urlencode(params)
     uri = "https://sandbox.tradier.com{}?{}".format(resource, query)
     headers = {"Accept": "application/json",
-               "Authorization": "Bearer {}".format(keys["token"])}
+               "Authorization": "Bearer {}".format(_config["token"])}
     t0 = time.time()
     r = requests.get(uri, headers=headers)
     js = r.json()
