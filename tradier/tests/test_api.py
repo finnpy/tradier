@@ -1,11 +1,11 @@
-import json
-import unittest
 import datetime
+import json
 import os.path
+import unittest
 
 import tradier
 
-local = True
+local = not tradier.valid_config()
 
 
 def inject_response(name):
@@ -86,7 +86,5 @@ class TestAccounts(unittest.TestCase):
             self.assertEqual(len(accts[1].positions), 8)
 
 
-
 if __name__ == "__main__":
     unittest.main(verbosity=2)
-

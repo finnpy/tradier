@@ -1,6 +1,11 @@
 import json
 import time
-import urllib
+
+try:
+    from urllib import urlencode
+except:
+    from urllib.parse import urlencode
+
 from collections import namedtuple
 from os.path import expanduser, join
 
@@ -192,7 +197,7 @@ max_pages = None
 
 def read_config():
     try:
-        with open(join(expanduser("~"), ".finnpy", "intrinio.json")) as f:
+        with open(join(expanduser("~"), ".finnpy", "tradier.json")) as f:
             cfg = json.load(f)
     except Exception as e:
         print("""Configuration file not specified."
@@ -201,11 +206,16 @@ def read_config():
         cfg = {}
     return cfg
 
+
 _config = read_config()
 
 
+def valid_config():
+    return "token" in _config
+
+
 def _get(resource, params):
-    query = urllib.urlencode(params)
+    query = urlencode(params)
     uri = "https://sandbox.tradier.com{}?{}".format(resource, query)
     headers = {"Accept": "application/json",
                "Authorization": "Bearer {}".format(_config["token"])}
