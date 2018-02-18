@@ -191,10 +191,15 @@ max_pages = None
 
 
 def read_config():
-    with open(join(expanduser("~"), ".finnpy", "intrinio.json")) as f:
-        cfg = json.load(f)
+    try:
+        with open(join(expanduser("~"), ".finnpy", "intrinio.json")) as f:
+            cfg = json.load(f)
+    except Exception as e:
+        print("""Configuration file not specified."
+                     "Please create a file ~/.finnpy/tradier.json with the following structure:
+                     {\"tradier\": {\"token\": authorization token}}""")
+        cfg = {}
     return cfg
-
 
 _config = read_config()
 
